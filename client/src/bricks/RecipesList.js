@@ -29,7 +29,7 @@ function RecipesList (props) {
             )
 
         });
-    }, [searchBy]);
+    }, [searchBy, props.recipesList, view]);
 
     function handleSearch(event) {
         event.preventDefault();
@@ -61,17 +61,16 @@ function RecipesList (props) {
                     </Button>
                 </Form>
                 <ButtonGroup className="d-flex justify-content-center">
-                    <DropdownButton className="mt-5" as={ButtonGroup} title="vyber náhled" id="bg-nested-dropdown" variant="secondary">
-                        <Dropdown.Item onClick={() => {setView("detail")}} eventKey="1">detailní</Dropdown.Item>
-                        <Dropdown.Item onClick={() => {setView("basic")}} eventKey="2">bez receptu</Dropdown.Item>
-                        <Dropdown.Item onClick={() => {setView("development")}} eventKey="3">pro vývojáře</Dropdown.Item>
+                    <DropdownButton className="mt-2" as={ButtonGroup} title="zobrazení receptů" id="bg-nested-dropdown" variant="secondary">
+                        <Dropdown.Item onClick={() => {setView("detail")}} eventKey="1">detail</Dropdown.Item>
+                        <Dropdown.Item onClick={() => {setView("basic")}} eventKey="2">náhled</Dropdown.Item>
+                        <Dropdown.Item onClick={() => {setView("development")}} eventKey="3">tabulka</Dropdown.Item>
                     </DropdownButton>
                 </ButtonGroup>
             </div>
 
-
             <div className={isDetail ? styles.recipesList : (view === "basic") ? styles.recipesListSmall : styles.recipesListDev}>
-            {isDetail ? <RecipesListDetail  recipesList={filteredRecipesList}/> : (view === "basic" ? <RecipesListSmall recipesList={filteredRecipesList}/> : <RecipesListDev recipesList={filteredRecipesList}/>)}
+            {isDetail ? <RecipesListDetail  recipesList={filteredRecipesList} ingredientsList={props.ingredientsList}/> : (view === "basic" ? <RecipesListSmall recipesList={filteredRecipesList} ingredientsList={props.ingredientsList}/> : <RecipesListDev recipesList={filteredRecipesList}/>)}
             </div>
         </div>
     )

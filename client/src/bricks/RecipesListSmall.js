@@ -2,8 +2,11 @@ import React from "react";
 import Recipe from "./Recipe";
 
 function RecipesListSmall (props) {
-    return props.recipesList.map((recipe) => {
-        return <Recipe key={recipe.id} recipe={recipe} mode="basic"/>
+    const ingredientsList = props.ingredientsList
+    const recipesList = props.recipesList
+
+    return recipesList.map((recipe) => {
+        return <Recipe key={recipe.id} recipe={recipe} mode="basic" ingredientsList={ingredientsList}/>
     })
 }
 
