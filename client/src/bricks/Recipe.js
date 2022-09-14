@@ -8,8 +8,6 @@ function Recipe(props) {
     const mode = props.mode
     const shortIngredientsList = props.recipe.ingredients.slice(0, 4)
     const ingredientsList = props.ingredientsList
-    // console.log(ingredientsList)
-    // console.log(shortIngredientsList)
 
     return (
         <Card className={styles.cardRecipe}>
@@ -28,8 +26,7 @@ function Recipe(props) {
                         <ul className="list-group list-group-flush">
                             {shortIngredientsList
                                 .map((item) => {
-                                    return <li key={item.id} className="text-center ps-2 list-group-item">{item.id}</li>
-                                    // I just don't know, how to get names of ingredients if I know theirs IDs...
+                                    return <li key={item.id} className="text-center ps-2 list-group-item">{ingredientsList.find(el => el.id === item.id).name}</li>
                                 })}
                         </ul> : <></>}
             </Card.Body>
