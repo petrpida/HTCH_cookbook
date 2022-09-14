@@ -1,8 +1,4 @@
 .App {
   margin: 50px;
   text-align: center;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: stretch;
 }

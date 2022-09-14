@@ -1,6 +1,8 @@
+import React from "react";
 import './App.css';
 import RecipesList from "./bricks/RecipesList";
 import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 
 const recipesList = [
