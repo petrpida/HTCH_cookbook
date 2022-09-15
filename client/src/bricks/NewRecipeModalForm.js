@@ -7,10 +7,10 @@ function NewRecipeModalForm(props) {
     const [formData, setFormData] = useState({
         name: "",
         description: "",
-        ingredients: [{name: '', amount: '', unit: ''}]
+        ingredients: [{ingredientName: '', amount: '', unit: '', id: ''}],
     })
 
-    // function to be able to store data to formData from each input
+    // function to be able to store data into formData from each input
     const setField = (name, val) => {
         return setFormData((formData) => {
             const newData = { ...formData };
@@ -19,13 +19,20 @@ function NewRecipeModalForm(props) {
         });
     };
 
+    const setIngredientsArray = (name, val) => {
+        return setFormData((formData) => {
+            const newData = {...formData}
+            newData.ingredients[0][name] = val
+            return newData
+        })
+    }
+
     // handler to send data to server
     const handleSubmit = async (e) => {
         e.preventDefault();
         e.stopPropagation();
 
         const payload = {formData};
-
         console.log(payload);
     };
 
@@ -72,11 +79,10 @@ function NewRecipeModalForm(props) {
                 <Modal.Title>Nový recept</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form onSubmit={(e) => handleSubmit(e)}>
+                <Form id={"form"} onSubmit={(e) => handleSubmit(e)}>
                     <Form.Group className="mb-3" controlId="recipeName">
                         <Form.Label>Název receptu</Form.Label>
                         <Form.Control
-                            value={formData.name}
                             onChange={(e) => setField("name", e.target.value)}/>
                     </Form.Group>
 
@@ -84,15 +90,14 @@ function NewRecipeModalForm(props) {
                         <Form.Label>Postup</Form.Label>
                         <Form.Control
                             as="textarea"
-                            value={formData.description}
                             onChange={(e) => setField("description", e.target.value)}/>
                     </Form.Group>
+
                     <div className={"d-flex justify-content-center gap-1"}>
                         <Form.Group className="mb-1 w-75" controlId="ingredients">
                             <Form.Label>Ingdredience</Form.Label>
                             <Form.Select
-                                value={formData.ingredients.name}
-                                onChange={(e) => setField("ingredients", e.target.value)}>
+                                onChange={(e) => setIngredientsArray("ingredientName", e.target.value)}>
                                 <option></option>
                                 {sortedIngredientsList.map((item) => {
                                     return <option key={item.id}>{item.name}</option>
@@ -102,29 +107,24 @@ function NewRecipeModalForm(props) {
                         <Form.Group className="mb-1" controlId="amount">
                             <Form.Label>Počet</Form.Label>
                             <Form.Control
-                                value={formData.ingredients.amount}
-                                onChange={(e) => setField("ingredients[amount]", parseInt(e.target.value, 10))}/>
+                                onChange={(e) => setIngredientsArray("amount", parseInt(e.target.value, 10))}/>
                         </Form.Group>
                         <Form.Group className="mb-1" controlId="unit">
                             <Form.Label>Jednotka</Form.Label>
                             <Form.Control
-                                value={formData.ingredients.unit}
-                                onChange={(e) => setField("ingredients[unit]", e.target.value)}/>
+                                onChange={(e) => setIngredientsArray("unit", e.target.value)}/>
                         </Form.Group>
                     </div>
                     {customInputGroup()}
                     {customInputGroup()}
                     {customInputGroup()}
                     {customInputGroup()}
-                    <div className={"d-flex justify-content-between"}>
+                    <div className={"d-flex justify-content-between mt-5"}>
                     <Button variant="danger" size="lg" className={"w-25"} onClick={handleCloseModal}>Odejít</Button>
                     <Button variant="success" type="submit" size="lg" className={"w-25"}>Odeslat</Button>
                     </div>
                 </Form>
             </Modal.Body>
-            <Modal.Footer>
-
-            </Modal.Footer>
         </Modal>
         <Button onClick={handleShowModal} variant="success" size="lg" className={"w-25"}>Přidej recept</Button>
     </>
