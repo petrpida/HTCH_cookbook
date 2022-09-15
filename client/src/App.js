@@ -38,38 +38,40 @@ function App() {
     }, [])
 
     function getChild() {
-        switch (cookbookData.state) {
-            case "pending":
-                return (
-                    // <div className={styles.loading}>
-                    <div>
-                        <Icon size={3} path={mdiLoading} spin={true} />
-                    </div>
-                );
-            case "success":
-                return (
-                    <>
-                        <div className='display-4 text-decoration-underline'>Recepty</div>
-                        <RecipesList recipesList={cookbookData.data} ingredientsList={ingredientsData.data} />
-                    </>
-                );
-            case "error":
-                return (
-                    // <div className={styles.error}>
-                    <div>
-                        <div>Nepodařilo se načíst recepty.</div>
-                        <br />
-                        <pre>{JSON.stringify(cookbookData.error, null, 2)}</pre>
-                    </div>
-                );
-            default:
-                return null;
+        const isPending = cookbookData.state === 'pending' || ingredientsData.state === 'pending'
+        const isSuccess = cookbookData.state === 'success' && ingredientsData.state === 'success'
+        const isError = cookbookData.state === 'error' || ingredientsData.state === 'error'
+
+        if (isPending) {
+            return (
+                // <div className={styles.loading}>
+                <div>
+                    <Icon size={3} path={mdiLoading} spin={true} />
+                </div>
+            )}
+        else if (isSuccess) {
+            return (
+                <>
+                    <RecipesList recipesList={cookbookData.data} ingredientsList={ingredientsData.data} />
+                </>
+            );
         }
+        else if (isError) {
+            return (
+                // <div className={styles.error}>
+                <div>
+                    <div>Nepodařilo se načíst recepty.</div>
+                    <br />
+                    <pre>{JSON.stringify(cookbookData.error, null, 2)}</pre>
+                </div>
+            );
+        }
+        return null
     }
 
     return (
     <div className="App">
-        {cookbookData && ingredientsData && getChild()}
+        {getChild()}
     </div>
   );
 }
