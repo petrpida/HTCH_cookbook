@@ -1,5 +1,5 @@
 .recipesList {
-    margin: 48px 16px;
+    margin: 32px 16px;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -7,7 +7,7 @@
 }
 
 .recipesListSmall {
-    margin: 48px 16px;
+    margin: 32px 16px;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -15,5 +15,5 @@
 }
 
 .recipesListDev {
-    margin: 48px 16px;
+    margin: 32px 16px;
 }

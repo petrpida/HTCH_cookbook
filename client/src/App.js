@@ -24,11 +24,11 @@ function App() {
                             </Offcanvas.Title>
                         </Offcanvas.Header>
                         <Offcanvas.Body>
-                            <Nav className="justify-content-end flex-grow-1 pe-3">
+                            <Nav className="justify-content-end flex-grow-1">
                                 <Button variant="primary" onClick={() =>
                                     navigate("/recipesListPage")
                                 }>Recepty</Button>
-                                <Button variant="success" className={"ms-0 ms-sm-2 mt-2 mt-sm-0"} onClick={() => {
+                                <Button variant="primary" className={"ms-0 ms-sm-2 mt-2 mt-sm-0"} onClick={() => {
                                     navigate("/ingredientsListPage")
                                 }}>Ingredience</Button>
                             </Nav>

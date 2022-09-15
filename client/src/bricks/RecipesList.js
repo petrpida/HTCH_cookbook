@@ -13,6 +13,7 @@ import RecipesListSmall from "./RecipesListSmall";
 import RecipesListDev from "./RecipesListDev";
 import styles from '../css/recipesList.module.css'
 import {Container, Navbar} from "react-bootstrap";
+import NewRecipeModalForm from "./NewRecipeModalForm";
 
 function RecipesList(props) {
     const [view, setView] = useState("detail");
@@ -54,7 +55,7 @@ function RecipesList(props) {
                                 id={"searchInput"}
                                 style={{maxWidth: "150px"}}
                                 type="search"
-                                placeholder="Search"
+                                placeholder="Hledej"
                                 aria-label="Search"
                                 onChange={handleSearchDelete}
                             />
@@ -66,7 +67,7 @@ function RecipesList(props) {
                                 <Icon size={1} path={mdiMagnify}/>
                             </Button>
                         </Form>
-                        <DropdownButton className="me-2 mt-2 mt-sm-0" as={ButtonGroup} title="zobrazení receptů"
+                        <DropdownButton className="mt-2 mt-sm-0" as={ButtonGroup} title="Zobrazení receptů"
                                         id="bg-nested-dropdown" variant="secondary">
                             <Dropdown.Item onClick={() => {
                                 setView("detail")
@@ -78,10 +79,10 @@ function RecipesList(props) {
                                 setView("development")
                             }} eventKey="3">tabulka</Dropdown.Item>
                         </DropdownButton>
-
                     </Navbar.Collapse>
                 </Container>
             </Navbar>
+            <NewRecipeModalForm ingredientsList={props.ingredientsList}/>
             <div
                 className={isDetail ? styles.recipesList : (view === "basic") ? styles.recipesListSmall : styles.recipesListDev}>
                 {isDetail ? <RecipesListDetail recipesList={filteredRecipesList}
