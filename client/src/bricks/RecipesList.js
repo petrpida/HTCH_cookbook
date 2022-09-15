@@ -12,7 +12,7 @@ import RecipesListDetail from "./RecipesListDetail";
 import RecipesListSmall from "./RecipesListSmall";
 import RecipesListDev from "./RecipesListDev";
 import styles from '../css/recipesList.module.css'
-import {Navbar} from "react-bootstrap";
+import {Container, Navbar} from "react-bootstrap";
 
 function RecipesList(props) {
     const [view, setView] = useState("detail");
@@ -43,10 +43,9 @@ function RecipesList(props) {
     }
 
     return (
-        <div>
-
+        <>
             <Navbar collapseOnSelect expand="sm" bg="light" className={"p-3"}>
-                <div className="container-fluid">
+                <Container fluid>
                     <Navbar.Brand>Receptář</Navbar.Brand>
                     <Navbar.Toggle aria-controls="responsive-navbar-nav"/>
                     <Navbar.Collapse style={{justifyContent: "right"}}>
@@ -81,7 +80,7 @@ function RecipesList(props) {
                         </DropdownButton>
 
                     </Navbar.Collapse>
-                </div>
+                </Container>
             </Navbar>
             <div
                 className={isDetail ? styles.recipesList : (view === "basic") ? styles.recipesListSmall : styles.recipesListDev}>
@@ -90,7 +89,7 @@ function RecipesList(props) {
                     <RecipesListSmall recipesList={filteredRecipesList} ingredientsList={props.ingredientsList}/> :
                     <RecipesListDev recipesList={filteredRecipesList}/>)}
             </div>
-        </div>
+        </>
     )
 }
 
