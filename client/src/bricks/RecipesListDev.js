@@ -8,7 +8,6 @@ function RecipesListDev (props) {
         <tr>
             <th className="text-start">Název</th>
             <th className="text-end">ID receptu</th>
-            {/*<th>Počet ingrediencí</th>*/}
         </tr>
         </thead>
         <tbody>
@@ -17,7 +16,6 @@ function RecipesListDev (props) {
                 <tr key={recipe.id}>
                     <td className="text-start">{recipe.name}</td>
                     <td className="text-end">{recipe.id}</td>
-                    {/*<td>{recipe.ingredients.length}</td>*/}
                 </tr>
             );
         })}
