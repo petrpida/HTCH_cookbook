@@ -3,11 +3,17 @@ import React, {useState} from "react";
 import {Form, Modal} from "react-bootstrap";
 
 function NewRecipeModalForm(props) {
+
+    const emptyIngredient = () => {
+        return {amount: 0, unit: '', id: ''}
+    }
+
     // state where to save form data
     const [formData, setFormData] = useState({
         name: "",
         description: "",
-        ingredients: [{ingredientName: '', amount: '', unit: '', id: ''}],
+        ingredients: [
+        ],
     })
 
     // function to be able to store data into formData from each input
@@ -19,10 +25,17 @@ function NewRecipeModalForm(props) {
         });
     };
 
-    const setIngredientsArray = (name, val) => {
+    const setIngredientField = (inputName, val, index) => {
+
         return setFormData((formData) => {
             const newData = {...formData}
-            newData.ingredients[0][name] = val
+
+            // if (inputName === 'id') {
+            //     const ing = props.ingredientsList.find(el => el.id === val)
+            //     newData.ingredients[index]['ingredientName'] = ing.name
+            // }
+
+            newData.ingredients[index][inputName] = val
             return newData
         })
     }
@@ -30,11 +43,30 @@ function NewRecipeModalForm(props) {
     // handler to send data to server
     const handleSubmit = async (e) => {
         e.preventDefault();
-        e.stopPropagation();
 
-        const payload = {formData};
-        console.log(payload);
+
+        console.log(formData)
     };
+
+    const addEmptyIngredient = () => {
+        const newFormData = {
+            ...formData,
+            ingredients: [...formData.ingredients, emptyIngredient()]
+        }
+        setFormData(newFormData)
+    }
+
+    function removeIngredient(index) {
+        const newIngredients = [...formData.ingredients]
+        newIngredients.splice(index, 1)
+
+
+        const newFormData = {
+            ...formData,
+            ingredients: newIngredients
+        }
+        setFormData(newFormData)
+    }
 
     //state for modal
     const [isShown, setIsShown] = useState(false);
@@ -52,23 +84,39 @@ function NewRecipeModalForm(props) {
     const handleCloseModal = () => setIsShown(false);
 
     // function to create new line of input group to add ingredient
-    const customInputGroup = () => {
+    const ingredienceInputGroup = (ingredient, index) => {
         return (
-            <div className={"d-flex justify-content-center gap-1"}>
+            <div key={index} className={"d-flex justify-content-center gap-1"}>
                 <Form.Group className="mb-1 w-75" controlId="ingredients">
-                    <Form.Select>
+                    <Form.Label>Ingdredience</Form.Label>
+                    <Form.Select
+                        value={ingredient.id}
+                        onChange={(e) => setIngredientField("id",e.target.value, index)}>
                         <option></option>
                         {sortedIngredientsList.map((item) => {
-                            return <option key={item.id}>{item.name}</option>
+                            return <option key={item.id} value={item.id}>{item.name}</option>
                         })}
                     </Form.Select>
                 </Form.Group>
+
                 <Form.Group className="mb-1" controlId="amount">
-                    <Form.Control type="text"/>
+                    <Form.Label>Počet</Form.Label>
+                    <Form.Control type="number"
+                                  value={ingredient.amount}
+                                  onChange={(e) => setIngredientField("amount", parseInt(e.target.value), index)}
+                    />
                 </Form.Group>
+
                 <Form.Group className="mb-1" controlId="unit">
-                    <Form.Control/>
+                    <Form.Label>Jednotka</Form.Label>
+                    <Form.Control
+                        value={ingredient.unit}
+                        onChange={(e) => setIngredientField("unit",e.target.value, index)}/>
                 </Form.Group>
+
+                <Button onClick={() => removeIngredient(index)}>
+                    X
+                </Button>
             </div>
         )
     }
@@ -93,32 +141,19 @@ function NewRecipeModalForm(props) {
                             onChange={(e) => setField("description", e.target.value)}/>
                     </Form.Group>
 
-                    <div className={"d-flex justify-content-center gap-1"}>
-                        <Form.Group className="mb-1 w-75" controlId="ingredients">
-                            <Form.Label>Ingdredience</Form.Label>
-                            <Form.Select
-                                onChange={(e) => setIngredientsArray("ingredientName", e.target.value)}>
-                                <option></option>
-                                {sortedIngredientsList.map((item) => {
-                                    return <option key={item.id}>{item.name}</option>
-                                })}
-                            </Form.Select>
-                        </Form.Group>
-                        <Form.Group className="mb-1" controlId="amount">
-                            <Form.Label>Počet</Form.Label>
-                            <Form.Control
-                                onChange={(e) => setIngredientsArray("amount", parseInt(e.target.value, 10))}/>
-                        </Form.Group>
-                        <Form.Group className="mb-1" controlId="unit">
-                            <Form.Label>Jednotka</Form.Label>
-                            <Form.Control
-                                onChange={(e) => setIngredientsArray("unit", e.target.value)}/>
-                        </Form.Group>
-                    </div>
-                    {customInputGroup()}
-                    {customInputGroup()}
-                    {customInputGroup()}
-                    {customInputGroup()}
+                    {
+                        formData.ingredients.map((ing, index) => {
+                            return ingredienceInputGroup(ing, index)
+                        })
+                    }
+
+                    <Button onClick={addEmptyIngredient}>
+                        Add
+                    </Button>
+
+                    {/*{customInputGroup(0)}*/}
+                    {/*{customInputGroup(1)}*/}
+                    {/*{customInputGroup(2)}*/}
                     <div className={"d-flex justify-content-between mt-5"}>
                     <Button variant="danger" size="lg" className={"w-25"} onClick={handleCloseModal}>Odejít</Button>
                     <Button variant="success" type="submit" size="lg" className={"w-25"}>Odeslat</Button>
