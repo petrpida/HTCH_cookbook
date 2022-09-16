@@ -3,14 +3,22 @@ import React, {useState} from "react";
 import {Form, Modal} from "react-bootstrap";
 
 function NewRecipeModalForm(props) {
+    //state for modal
+    const [isShown, setIsShown] = useState(false);
+
     // state where to save form data
     const [formData, setFormData] = useState({
         name: "",
         description: "",
-        ingredients: [{ingredientName: '', amount: '', unit: '', id: ''}],
+        ingredients: [],
     })
 
-    // function to be able to store data into formData from each input
+    // function to get new object for new ingredient
+    const emptyIngredient = () => {
+        return {amount: '', unit: '', id: ''}
+    }
+
+    // function to be able to store data into formData from name and description inputs
     const setField = (name, val) => {
         return setFormData((formData) => {
             const newData = { ...formData };
@@ -19,10 +27,17 @@ function NewRecipeModalForm(props) {
         });
     };
 
-    const setIngredientsArray = (name, val) => {
+    // function to be able to store data into formData.ingredients from other inputs
+    const setIngredientsField = (inputName, value, index) => {
         return setFormData((formData) => {
             const newData = {...formData}
-            newData.ingredients[0][name] = val
+
+            /*if (inputName === 'id') {
+                const ingName = props.ingredientsList.find(item => item.id === value).name
+                console.log(ingName)
+            }*/
+
+            newData.ingredients[index][inputName] = value
             return newData
         })
     }
@@ -30,18 +45,13 @@ function NewRecipeModalForm(props) {
     // handler to send data to server
     const handleSubmit = async (e) => {
         e.preventDefault();
-        e.stopPropagation();
 
         const payload = {formData};
         console.log(payload);
     };
 
-    //state for modal
-    const [isShown, setIsShown] = useState(false);
-
     //sorted ingredients list
-    const ingredientsList = props.ingredientsList
-    const sortedIngredientsList = ingredientsList.sort((a,b) => {
+    const sortedIngredientsList = props.ingredientsList.sort((a,b) => {
         if (a.name < b.name) {return -1}
         if (a.name > b.name) {return 1}
         return 0
@@ -51,24 +61,59 @@ function NewRecipeModalForm(props) {
     const handleShowModal = () => setIsShown(true);
     const handleCloseModal = () => setIsShown(false);
 
+    // to add group of empty inputs to be able to add new ingredient into formData
+    const addNewIngredient = () => {
+        const newData = {
+            ...formData,
+            ingredients: [...formData.ingredients, emptyIngredient()]
+        }
+        setFormData(newData)
+    }
+
+    // to remove one ingredient from list of ingredients
+    const removeIngredient = (index) => {
+        const newIngredientsList = [...formData.ingredients]
+        newIngredientsList.splice(index, 1)
+
+        const newData = {
+            ...formData,
+            ingredients: newIngredientsList
+        }
+        setFormData(newData)
+    }
+
     // function to create new line of input group to add ingredient
-    const customInputGroup = () => {
+    const ingredientInputGroup = (ingredient, index) => {
         return (
-            <div className={"d-flex justify-content-center gap-1"}>
-                <Form.Group className="mb-1 w-75" controlId="ingredients">
-                    <Form.Select>
-                        <option></option>
+            <div className={"d-flex justify-content-center gap-1"} key={index}>
+                <Form.Group className="mb-2 w-75" controlId="ingredients">
+                    <Form.Select
+                        placeholder="vyber ingredienci"
+                        value={ingredient.id}
+                        onChange={(e) => setIngredientsField("id", e.target.value, index)}>
+                        >
+                        <option>vyber ingredienci</option>
                         {sortedIngredientsList.map((item) => {
-                            return <option key={item.id}>{item.name}</option>
+                            return <option key={item.id} value={item.id}>{item.name}</option>
                         })}
                     </Form.Select>
                 </Form.Group>
-                <Form.Group className="mb-1" controlId="amount">
-                    <Form.Control type="text"/>
+                <Form.Group className="mb-2" controlId="amount">
+                    <Form.Control
+                        placeholder="zadej počet"
+                        type="text"
+                        value={ingredient.amount}
+                        onChange={(e) => setIngredientsField("amount", parseInt(e.target.value, 10), index)}/>
                 </Form.Group>
-                <Form.Group className="mb-1" controlId="unit">
-                    <Form.Control/>
+                <Form.Group className="mb-2" controlId="unit">
+                    <Form.Control
+                        placeholder="jednotka"
+                        value={ingredient.unit}
+                        onChange={(e) => setIngredientsField("unit", e.target.value, index)}/>
                 </Form.Group>
+                <Button variant={"outline-danger"} size={"sm"} className={"mb-2"} onClick={() => removeIngredient(index)}>
+                    X
+                </Button>
             </div>
         )
     }
@@ -93,32 +138,17 @@ function NewRecipeModalForm(props) {
                             onChange={(e) => setField("description", e.target.value)}/>
                     </Form.Group>
 
-                    <div className={"d-flex justify-content-center gap-1"}>
-                        <Form.Group className="mb-1 w-75" controlId="ingredients">
-                            <Form.Label>Ingdredience</Form.Label>
-                            <Form.Select
-                                onChange={(e) => setIngredientsArray("ingredientName", e.target.value)}>
-                                <option></option>
-                                {sortedIngredientsList.map((item) => {
-                                    return <option key={item.id}>{item.name}</option>
-                                })}
-                            </Form.Select>
-                        </Form.Group>
-                        <Form.Group className="mb-1" controlId="amount">
-                            <Form.Label>Počet</Form.Label>
-                            <Form.Control
-                                onChange={(e) => setIngredientsArray("amount", parseInt(e.target.value, 10))}/>
-                        </Form.Group>
-                        <Form.Group className="mb-1" controlId="unit">
-                            <Form.Label>Jednotka</Form.Label>
-                            <Form.Control
-                                onChange={(e) => setIngredientsArray("unit", e.target.value)}/>
-                        </Form.Group>
+                    <div className={"d-flex flex-column"}>
+                    <Form.Label>Ingredience</Form.Label>
+                    {formData.ingredients.map((ing, index) => {
+                        return ingredientInputGroup(ing, index)
+                    })}
                     </div>
-                    {customInputGroup()}
-                    {customInputGroup()}
-                    {customInputGroup()}
-                    {customInputGroup()}
+
+                    <Button variant={"primary"} className={"w-100"} onClick={addNewIngredient}>
+                        Přidej ingredienci
+                    </Button>
+
                     <div className={"d-flex justify-content-between mt-5"}>
                     <Button variant="danger" size="lg" className={"w-25"} onClick={handleCloseModal}>Odejít</Button>
                     <Button variant="success" type="submit" size="lg" className={"w-25"}>Odeslat</Button>
@@ -126,7 +156,7 @@ function NewRecipeModalForm(props) {
                 </Form>
             </Modal.Body>
         </Modal>
-        <Button onClick={handleShowModal} variant="success" size="lg" className={"w-25"}>Přidej recept</Button>
+        <Button onClick={handleShowModal} variant="success" size="lg" className={"w-25 mt-4"}>Přidej recept</Button>
     </>
 }
 
