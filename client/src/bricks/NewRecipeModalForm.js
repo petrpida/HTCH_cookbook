@@ -1,13 +1,12 @@
 import Button from "react-bootstrap/Button";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Form, Modal} from "react-bootstrap";
 import Icon from "@mdi/react";
-import {mdiLoading} from "@mdi/js";
+import {mdiLoading, mdiPencilOutline} from "@mdi/js";
 
-function NewRecipeModalForm({ ingredientsList, onComplete}) {
-    //console.log(onComplete)
+function NewRecipeModalForm({ ingredientsList, onComplete, recipe}) {
     // state for modal
-    const [isShown, setIsShown] = useState(false);
+    const [isShown, setIsShown] = useState({state: false});
     // state for form validation
     const [validated, setValidated] = useState(false);
     // default form data
@@ -22,6 +21,16 @@ function NewRecipeModalForm({ ingredientsList, onComplete}) {
     const [addNewRecipeCall, setAddNewRecipeCall] = useState({
         state: "inactive"
     })
+
+    useEffect(() => {
+        if (recipe) {
+            setFormData({
+                name: recipe.name,
+                description: recipe.description,
+                ingredients: recipe.ingredients
+            })
+        }
+    }, [recipe])
 
     // function to get new object for new ingredient
     const emptyIngredient = () => {
@@ -71,10 +80,11 @@ function NewRecipeModalForm({ ingredientsList, onComplete}) {
             ing.amount = parseFloat(ing.amount)
         })
 
-        const payload = newData;
+        const payload = {...newData,
+        id: recipe ? recipe.id : null};
 
         setAddNewRecipeCall({state: "pending"});
-        const res = await fetch(`http://localhost:3000/recipe/create`, {
+        const res = await fetch(`http://localhost:3000/recipe/${recipe ? "update" : "create"}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -87,6 +97,7 @@ function NewRecipeModalForm({ ingredientsList, onComplete}) {
         if (res.status >= 400) {
             setAddNewRecipeCall({state: "error", error: data});
         } else {
+            console.log(data)
             setAddNewRecipeCall({state: "success", data});
         }
 
@@ -110,12 +121,12 @@ function NewRecipeModalForm({ ingredientsList, onComplete}) {
     })
 
     // handlers to control modal
-    const handleShowModal = () => setIsShown(true);
+    const handleShowModal = (data) => setIsShown({state: true, data});
     const handleCloseModal = () => {
         setFormData(defaultFormData)
         setAddNewRecipeCall({state: 'inactive'})
         setValidated(false)
-        setIsShown(false);
+        setIsShown({state: false});
     }
 
     // to add group of empty inputs to be able to add new ingredient into formData
@@ -185,7 +196,7 @@ function NewRecipeModalForm({ ingredientsList, onComplete}) {
                     </Form.Control.Feedback>
                 </Form.Group>
                 <div className={"mb-2"}>
-                    <Button variant={"danger"} onClick={() => removeIngredient(index)}>
+                    <Button variant={"outline-danger"} onClick={() => removeIngredient(index)}>
                         X
                     </Button>
                     <div className={"invalid-feedback"}></div>
@@ -198,15 +209,16 @@ function NewRecipeModalForm({ ingredientsList, onComplete}) {
     }
 
     return <>
-        <Modal show={isShown} onHide={handleCloseModal} size="lg">
+        <Modal show={isShown.state} onHide={handleCloseModal} size="lg">
             <Modal.Header closeButton>
-                <Modal.Title>Nový recept</Modal.Title>
+                <Modal.Title>{recipe ? "Změna receptu" : "Nový recept"}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form noValidate validated={validated} id={"form"} onSubmit={(e) => handleSubmit(e)}>
                     <Form.Group className="mb-3" controlId="recipeName">
                         <Form.Label>Název receptu</Form.Label>
                         <Form.Control
+                            value={formData.name}
                             onChange={(e) => setField("name", e.target.value)}
                             maxLength={150}
                             required
@@ -219,7 +231,9 @@ function NewRecipeModalForm({ ingredientsList, onComplete}) {
                     <Form.Group className="mb-3" controlId="description">
                         <Form.Label>Postup</Form.Label>
                         <Form.Control
+                            value={formData.description}
                             as="textarea"
+                            rows={5}
                             maxLength={1500}
                             onChange={(e) => setField("description", e.target.value)}/>
                         <Form.Control.Feedback type="invalid">
@@ -239,18 +253,17 @@ function NewRecipeModalForm({ ingredientsList, onComplete}) {
                     </Button>
 
                     <div className={"d-flex justify-content-between mt-5"}>
-                        <Button variant="secondary" size="lg" className={"w-25"}
+                        <Button variant="secondary"  className={"w-50 me-1"}
                                 onClick={handleCloseModal}>Odejít</Button>
                         <Button variant="success"
                                 type="submit"
-                                size="lg"
-                                className={"w-25"}
+                                className={"w-50 ms-1"}
                                 disabled={addNewRecipeCall.state === 'pending'}
                         >
                             {addNewRecipeCall.state === 'pending' ? (
                                 <Icon size={0.8} path={mdiLoading} spin={true}/>
                             ) : (
-                                "Přidat"
+                                recipe ? "Odeslat změny" : "Přidat recept"
                             )}
                         </Button>
                     </div>
@@ -262,7 +275,19 @@ function NewRecipeModalForm({ ingredientsList, onComplete}) {
                 </Modal.Footer>
             }
         </Modal>
-        <Button onClick={handleShowModal} variant="success" size="lg" className={"w-25 mt-4"}>Přidej recept</Button>
+
+        {recipe ?
+            <div className={"d-flex w-100 justify-content-end"}>
+                <Button onClick={handleShowModal} variant={"light"} size={"sm"}>
+                    <Icon
+                        size={1}
+                        path={mdiPencilOutline}
+                    />
+                </Button>
+            </div>
+            :
+            <Button onClick={handleShowModal} variant="success" size="lg" className={"w-50 mt-4"}>Přidej recept</Button>
+        }
     </>
 }
 

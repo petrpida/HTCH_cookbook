@@ -58,7 +58,7 @@ function RecipesList(props) {
                     <Navbar.Brand>Receptář</Navbar.Brand>
                     <Navbar.Toggle aria-controls="responsive-navbar-nav"/>
                     <Navbar.Collapse style={{justifyContent: "right"}}>
-                        <Form className="d-flex justify-content-center" onSubmit={handleSearch}>
+                        <Form className="d-flex justify-content-center mt-2 mt-sm-0" onSubmit={handleSearch}>
                             <Form.Control
                                 id={"searchInput"}
                                 style={{maxWidth: "150px"}}
@@ -72,7 +72,7 @@ function RecipesList(props) {
                                 variant="outline-success"
                                 type="submit"
                             >
-                                <Icon size={1} path={mdiMagnify}/>
+                                <Icon size={0.8} path={mdiMagnify}/>
                             </Button>
                         </Form>
                         <DropdownButton className="mt-2 mt-sm-0" as={ButtonGroup} title="Zobrazení receptů"

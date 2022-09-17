@@ -43,9 +43,9 @@ function RecipesListPage() {
 
         if (isPending) {
             return (
-                // <div className={styles.loading}>
-                <div>
+                <div className={"d-flex flex-column justify-content-center align-items-center h-50 "}>
                     <Icon size={3} path={mdiLoading} spin={true}/>
+                    <span className={"fs-3"}>LOADING</span>
                 </div>
             )
         } else if (isSuccess) {
@@ -56,7 +56,6 @@ function RecipesListPage() {
             );
         } else if (isError) {
             return (
-                // <div className={styles.error}>
                 <div>
                     <div>Nepodařilo se načíst recepty.</div>
                     <br/>
