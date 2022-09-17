@@ -16,12 +16,15 @@ import {Container, Navbar} from "react-bootstrap";
 import NewRecipeModalForm from "./NewRecipeModalForm";
 
 function RecipesList(props) {
+    //console.log(props.recipesList)
     const [view, setView] = useState("detail");
     const isDetail = view === "detail";
     const [searchBy, setSearchBy] = useState("");
+    const [recipesList, setRecipesList] = useState(props.recipesList)
+
 
     const filteredRecipesList = useMemo(() => {
-        return props.recipesList.filter((item) => {
+        return recipesList.filter((item) => {
             if (view === "detail") {
                 return (
                     item.name.toLocaleLowerCase().includes(searchBy.toLocaleLowerCase()) ||
@@ -32,7 +35,7 @@ function RecipesList(props) {
             )
 
         });
-    }, [searchBy, props.recipesList, view]);
+    }, [searchBy, recipesList, view]);
 
     function handleSearch(event) {
         event.preventDefault();
@@ -41,6 +44,11 @@ function RecipesList(props) {
 
     function handleSearchDelete(event) {
         if (!event.target.value) setSearchBy("");
+    }
+
+    const callOnComplete = (data) => {
+        const newRecipesList = [...props.recipesList, data]
+        setRecipesList(newRecipesList)
     }
 
     return (
@@ -82,13 +90,11 @@ function RecipesList(props) {
                     </Navbar.Collapse>
                 </Container>
             </Navbar>
-            <NewRecipeModalForm ingredientsList={props.ingredientsList}/>
-            <div
-                className={isDetail ? styles.recipesList : (view === "basic") ? styles.recipesListSmall : styles.recipesListDev}>
-                {isDetail ? <RecipesListDetail recipesList={filteredRecipesList}
-                                               ingredientsList={props.ingredientsList}/> : (view === "basic" ?
-                    <RecipesListSmall recipesList={filteredRecipesList} ingredientsList={props.ingredientsList}/> :
-                    <RecipesListDev recipesList={filteredRecipesList}/>)}
+            <NewRecipeModalForm ingredientsList={props.ingredientsList} onComplete={callOnComplete}/>
+            <div className={isDetail ? styles.recipesList : (view === "basic") ? styles.recipesListSmall : styles.recipesListDev}>
+                {isDetail ? <RecipesListDetail recipesList={filteredRecipesList} ingredientsList={props.ingredientsList}/>
+                : (view === "basic" ? <RecipesListSmall recipesList={filteredRecipesList} ingredientsList={props.ingredientsList}/>
+                : <RecipesListDev recipesList={filteredRecipesList}/>)}
             </div>
         </>
     )

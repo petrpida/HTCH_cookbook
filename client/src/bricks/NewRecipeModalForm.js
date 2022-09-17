@@ -1,19 +1,26 @@
 import Button from "react-bootstrap/Button";
 import React, {useState} from "react";
 import {Form, Modal} from "react-bootstrap";
+import Icon from "@mdi/react";
+import {mdiLoading} from "@mdi/js";
 
-function NewRecipeModalForm(props) {
+function NewRecipeModalForm({ ingredientsList, onComplete}) {
+    //console.log(onComplete)
     // state for modal
     const [isShown, setIsShown] = useState(false);
-
     // state for form validation
     const [validated, setValidated] = useState(false);
-
-    // state where to save form data
-    const [formData, setFormData] = useState({
+    // default form data
+    const defaultFormData = {
         name: "",
         description: "",
         ingredients: [],
+    }
+    // state where to save form data
+    const [formData, setFormData] = useState(defaultFormData)
+
+    const [addNewRecipeCall, setAddNewRecipeCall] = useState({
+        state: "inactive"
     })
 
     // function to get new object for new ingredient
@@ -24,7 +31,7 @@ function NewRecipeModalForm(props) {
     // function to be able to store data into formData from name and description inputs
     const setField = (name, val) => {
         return setFormData((formData) => {
-            const newData = { ...formData };
+            const newData = {...formData};
             newData[name] = val;
             return newData;
         });
@@ -53,32 +60,63 @@ function NewRecipeModalForm(props) {
     // handler to send data to server
     const handleSubmit = async (e) => {
         const form = e.currentTarget;
-
         e.preventDefault();
-
         if (!form.checkValidity()) {
             setValidated(true);
             return;
         }
-
         //parseFloat all ingredients.amount to send data to server as a number
         const newData = {...formData}
-        newData.ingredients.forEach((ing) => {ing.amount = parseFloat(ing.amount)})
+        newData.ingredients.forEach((ing) => {
+            ing.amount = parseFloat(ing.amount)
+        })
 
-        const payload = {newData};
-        console.log(payload)
+        const payload = newData;
+
+        setAddNewRecipeCall({state: "pending"});
+        const res = await fetch(`http://localhost:3000/recipe/create`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        if (res.status >= 400) {
+            setAddNewRecipeCall({state: "error", error: data});
+        } else {
+            setAddNewRecipeCall({state: "success", data});
+        }
+
+        if (typeof onComplete === 'function') {
+            onComplete(data);
+        }
+
+        handleCloseModal();
+
     };
 
     //sorted ingredients list
-    const sortedIngredientsList = props.ingredientsList.sort((a,b) => {
-        if (a.name < b.name) {return -1}
-        if (a.name > b.name) {return 1}
+    const sortedIngredientsList = ingredientsList.sort((a, b) => {
+        if (a.name < b.name) {
+            return -1
+        }
+        if (a.name > b.name) {
+            return 1
+        }
         return 0
     })
 
     // handlers to control modal
     const handleShowModal = () => setIsShown(true);
-    const handleCloseModal = () => setIsShown(false);
+    const handleCloseModal = () => {
+        setFormData(defaultFormData)
+        setAddNewRecipeCall({state: 'inactive'})
+        setValidated(false)
+        setIsShown(false);
+    }
 
     // to add group of empty inputs to be able to add new ingredient into formData
     const addNewIngredient = () => {
@@ -107,11 +145,11 @@ function NewRecipeModalForm(props) {
             <div className={"d-flex justify-content-center gap-1"} key={index}>
                 <Form.Group className="mb-2 w-75" controlId="ingredients">
                     <Form.Select
-                        required
                         value={ingredient.id}
-                        onChange={(e) => setIngredientsField("id", e.target.value, index)}>
-                        >
-                        <option value="">vyber ingredienci</option>
+                        onChange={(e) => setIngredientsField("id", e.target.value, index)}
+                        required
+                    >
+                        <option value=""></option>
                         {sortedIngredientsList.map((item) => {
                             return <option key={item.id} value={item.id}>{item.name}</option>
                         })}
@@ -147,9 +185,9 @@ function NewRecipeModalForm(props) {
                     </Form.Control.Feedback>
                 </Form.Group>
                 <div className={"mb-2"}>
-                <Button variant={"danger"}  onClick={() => removeIngredient(index)}>
-                    X
-                </Button>
+                    <Button variant={"danger"} onClick={() => removeIngredient(index)}>
+                        X
+                    </Button>
                     <div className={"invalid-feedback"}></div>
                 </div>
                 <Form.Control.Feedback type="invalid">
@@ -201,11 +239,28 @@ function NewRecipeModalForm(props) {
                     </Button>
 
                     <div className={"d-flex justify-content-between mt-5"}>
-                        <Button variant="secondary" size="lg" className={"w-25"} onClick={handleCloseModal}>Odejít</Button>
-                        <Button variant="success" type="submit" size="lg" className={"w-25"}>Odeslat</Button>
+                        <Button variant="secondary" size="lg" className={"w-25"}
+                                onClick={handleCloseModal}>Odejít</Button>
+                        <Button variant="success"
+                                type="submit"
+                                size="lg"
+                                className={"w-25"}
+                                disabled={addNewRecipeCall.state === 'pending'}
+                        >
+                            {addNewRecipeCall.state === 'pending' ? (
+                                <Icon size={0.8} path={mdiLoading} spin={true}/>
+                            ) : (
+                                "Přidat"
+                            )}
+                        </Button>
                     </div>
                 </Form>
             </Modal.Body>
+            {addNewRecipeCall.state === 'error' &&
+                <Modal.Footer className="bg-danger fs-3 fw-bold justify-content-center text-uppercase text-dark">
+                    Error: {addNewRecipeCall.error.errorMessage}
+                </Modal.Footer>
+            }
         </Modal>
         <Button onClick={handleShowModal} variant="success" size="lg" className={"w-25 mt-4"}>Přidej recept</Button>
     </>
