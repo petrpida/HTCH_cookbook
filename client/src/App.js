@@ -1,11 +1,13 @@
-import React from "react";
+import React, {useContext} from "react";
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Outlet, useNavigate} from "react-router-dom";
 import {Container, Navbar, Nav, Offcanvas} from "react-bootstrap";
 import Button from "react-bootstrap/Button";
+import UserContext from "./UserProvider";
 
 function App() {
+    const {isAuthorized, changeAuthorization} = useContext(UserContext)
     let navigate = useNavigate()
 
     return (
@@ -31,6 +33,10 @@ function App() {
                                 <Button variant="primary" className={"ms-0 ms-sm-2 mt-2 mt-sm-0"} onClick={() => {
                                     navigate("/ingredientsListPage")
                                 }}>Ingredience</Button>
+                                <Button className={"ms-0 ms-sm-2 mt-2 mt-sm-0"}
+                                        variant={"dark"}
+                                        onClick={() => {changeAuthorization()}}
+                                >{isAuthorized ? "Odhlásit se" : "Přihlásit se"}</Button>
                             </Nav>
                         </Offcanvas.Body>
                     </Navbar.Offcanvas>

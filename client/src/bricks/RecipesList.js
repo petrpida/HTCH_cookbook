@@ -1,4 +1,4 @@
-import React, {useState, useMemo} from "react";
+import React, {useState, useMemo, useContext} from "react";
 
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -14,9 +14,10 @@ import RecipesListDev from "./RecipesListDev";
 import styles from '../css/recipesList.module.css'
 import {Container, Navbar} from "react-bootstrap";
 import NewRecipeModalForm from "./NewRecipeModalForm";
+import UserContext from "../UserProvider";
 
 function RecipesList(props) {
-    //console.log(props.recipesList)
+    const {isAuthorized} = useContext(UserContext)
     const [view, setView] = useState("detail");
     const isDetail = view === "detail";
     const [searchBy, setSearchBy] = useState("");
@@ -90,7 +91,7 @@ function RecipesList(props) {
                     </Navbar.Collapse>
                 </Container>
             </Navbar>
-            <NewRecipeModalForm ingredientsList={props.ingredientsList} onComplete={callOnComplete}/>
+            {isAuthorized && <NewRecipeModalForm ingredientsList={props.ingredientsList} onComplete={callOnComplete}/>}
             <div className={isDetail ? styles.recipesList : (view === "basic") ? styles.recipesListSmall : styles.recipesListDev}>
                 {isDetail ? <RecipesListDetail recipesList={filteredRecipesList} ingredientsList={props.ingredientsList}/>
                 : (view === "basic" ? <RecipesListSmall recipesList={filteredRecipesList} ingredientsList={props.ingredientsList}/>
