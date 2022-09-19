@@ -1,11 +1,13 @@
-import React, {useContext, useState} from "react";
-import Card from 'react-bootstrap/Card';
-import styles from '../css/recipe.module.css'
+import {useContext, useState} from "react";
 import NewRecipeModalForm from "./NewRecipeModalForm";
+import RecipeDelete from "./RecipeDelete";
 import UserContext from "../UserProvider";
+import {Alert, Card} from "react-bootstrap";
+import styles from '../css/recipe.module.css'
 
 function Recipe(props) {
     const {isAuthorized} = useContext(UserContext)
+    const [deleteRecipeError, setDeleteRecipeError] = useState('');
     const mode = props.mode
     const ingredientsList = props.ingredientsList
     const [recipeData, setRecipeData] = useState(props.recipe)
@@ -15,25 +17,48 @@ function Recipe(props) {
         setRecipeData(recipe)
     }
 
+    const onDeleteCall = (id) => {
+        props.onDeletedRecipe(id)
+    }
+
     return (
         <Card className={styles.cardRecipe}>
+            {deleteRecipeError &&
+                <Alert
+                    variant="danger">
+                    Error: {deleteRecipeError}
+                </Alert>
+            }
             <Card.Title className={styles.cardTitle}>
-                {isAuthorized && <NewRecipeModalForm ingredientsList={props.ingredientsList} recipe={recipeData} onComplete={callOnComplete}/>}
-                <div className={isAuthorized ? styles.title : "h-100 d-flex align-items-center"}>{recipeData.name}</div>
+                {isAuthorized &&
+                    <div className={"d-flex justify-content-between w-100"}>
+                        <NewRecipeModalForm ingredientsList={props.ingredientsList}
+                                            recipe={recipeData}
+                                            onComplete={callOnComplete}/>
+                        <RecipeDelete onDelete={onDeleteCall}
+                                      onError={(error) => setDeleteRecipeError(error)}
+                                      recipe={recipeData}
+                        ></RecipeDelete>
+                    </div>}
+                <div className={isAuthorized ? styles.title : "h-100 d-flex align-items-center"}>
+                    {recipeData.name}
+                </div>
             </Card.Title>
             <Card.Img variant="top" src={props.recipe.imgUri}/>
             <Card.Body>
                 <Card.Text className={mode === "detail" ? '' : 'text-truncate'}>
                     {recipeData.description}
                 </Card.Text>
-                {props.mode === "basic" ?
+                {props.mode === "basic" &&
                     <ul className="list-group list-group-flush">
                         {shortIngredientsList
                             .map((item) => {
                                 return <li key={item.id}
-                                           className="text-center ps-2 list-group-item">{ingredientsList.find(el => el.id === item.id).name}</li>
+                                           className="text-center ps-2 list-group-item">
+                                    {ingredientsList.find(el => el.id === item.id).name}
+                                </li>
                             })}
-                    </ul> : <></>}
+                    </ul>}
             </Card.Body>
         </Card>
     );

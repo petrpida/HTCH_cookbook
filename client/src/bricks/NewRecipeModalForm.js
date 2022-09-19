@@ -50,17 +50,6 @@ function NewRecipeModalForm({ ingredientsList, onComplete, recipe}) {
     const setIngredientsField = (inputName, value, index) => {
         return setFormData((formData) => {
             const newData = {...formData}
-
-            /*if (inputName === 'id') {
-                            const ingName = props.ingredientsList.find(item => item.id === value).name
-                            console.log(ingName)
-                        }*/
-
-            /*if(inputName === "amount") {
-                newData.ingredients[index][inputName] = parseFloat(value)
-                return newData
-            }*/
-
             newData.ingredients[index][inputName] = value
             return newData
         })
@@ -106,7 +95,6 @@ function NewRecipeModalForm({ ingredientsList, onComplete, recipe}) {
         }
 
         handleCloseModal();
-
     };
 
     //sorted ingredients list
@@ -214,7 +202,10 @@ function NewRecipeModalForm({ ingredientsList, onComplete, recipe}) {
                 <Modal.Title>{recipe ? "Změna receptu" : "Nový recept"}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form noValidate validated={validated} id={"form"} onSubmit={(e) => handleSubmit(e)}>
+                <Form noValidate
+                      validated={validated}
+                      id={"form"}
+                      onSubmit={(e) => handleSubmit(e)}>
                     <Form.Group className="mb-3" controlId="recipeName">
                         <Form.Label>Název receptu</Form.Label>
                         <Form.Control
@@ -278,7 +269,7 @@ function NewRecipeModalForm({ ingredientsList, onComplete, recipe}) {
 
         {recipe ?
             <div className={"d-flex w-100 justify-content-end"}>
-                <Button onClick={handleShowModal} variant={"light"} size={"sm"}>
+                <Button onClick={handleShowModal} variant={"secondary me-1"} size={"sm"}>
                     <Icon
                         size={1}
                         path={mdiPencilOutline}
@@ -286,7 +277,14 @@ function NewRecipeModalForm({ ingredientsList, onComplete, recipe}) {
                 </Button>
             </div>
             :
-            <Button onClick={handleShowModal} variant="success" size="lg" className={"w-50 mt-4"}>Přidej recept</Button>
+            <Button
+                onClick={handleShowModal}
+                variant="success"
+                size="lg"
+                className={"w-50 mt-4"}
+            >
+                Přidej recept
+            </Button>
         }
     </>
 }

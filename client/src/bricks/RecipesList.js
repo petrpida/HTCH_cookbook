@@ -1,5 +1,4 @@
 import React, {useState, useMemo, useContext} from "react";
-
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown';
 import ButtonGroup from "react-bootstrap/ButtonGroup";
@@ -7,22 +6,20 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Icon from "@mdi/react";
 import {mdiMagnify} from "@mdi/js";
-
 import RecipesListDetail from "./RecipesListDetail";
-import RecipesListSmall from "./RecipesListSmall";
 import RecipesListDev from "./RecipesListDev";
+import NewRecipeModalForm from "./NewRecipeModalForm";
 import styles from '../css/recipesList.module.css'
 import {Container, Navbar} from "react-bootstrap";
-import NewRecipeModalForm from "./NewRecipeModalForm";
 import UserContext from "../UserProvider";
 
 function RecipesList(props) {
     const {isAuthorized} = useContext(UserContext)
     const [view, setView] = useState("detail");
     const isDetail = view === "detail";
+    const isBasic = view === "basic";
     const [searchBy, setSearchBy] = useState("");
     const [recipesList, setRecipesList] = useState(props.recipesList)
-
 
     const filteredRecipesList = useMemo(() => {
         return recipesList.filter((item) => {
@@ -34,7 +31,6 @@ function RecipesList(props) {
             } else return (
                 item.name.toLocaleLowerCase().includes(searchBy.toLocaleLowerCase())
             )
-
         });
     }, [searchBy, recipesList, view]);
 
@@ -52,11 +48,16 @@ function RecipesList(props) {
         setRecipesList(newRecipesList)
     }
 
+    const callOnDelete = (recipeId) => {
+        const newRecipesList = [...props.recipesList]
+        setRecipesList(newRecipesList.filter(recipe => recipe.id !== recipeId))
+    }
+
     return (
         <>
             <Navbar collapseOnSelect expand="sm" bg="light" className={"p-3"}>
                 <Container fluid>
-                    <Navbar.Brand>Receptář</Navbar.Brand>
+                    <Navbar.Brand>Recepty</Navbar.Brand>
                     <Navbar.Toggle aria-controls="responsive-navbar-nav"/>
                     <Navbar.Collapse style={{justifyContent: "right"}}>
                         <Form className="d-flex justify-content-center mt-2 mt-sm-0" onSubmit={handleSearch}>
@@ -69,7 +70,7 @@ function RecipesList(props) {
                                 onChange={handleSearchDelete}
                             />
                             <Button
-                                style={{marginRight: "8px"}}
+                                className={"me-2"}
                                 variant="outline-success"
                                 type="submit"
                             >
@@ -91,11 +92,19 @@ function RecipesList(props) {
                     </Navbar.Collapse>
                 </Container>
             </Navbar>
+
             {isAuthorized && <NewRecipeModalForm ingredientsList={props.ingredientsList} onComplete={callOnComplete}/>}
-            <div className={isDetail ? styles.recipesList : (view === "basic") ? styles.recipesListSmall : styles.recipesListDev}>
-                {isDetail ? <RecipesListDetail recipesList={filteredRecipesList} ingredientsList={props.ingredientsList}/>
-                : (view === "basic" ? <RecipesListSmall recipesList={filteredRecipesList} ingredientsList={props.ingredientsList}/>
-                : <RecipesListDev recipesList={filteredRecipesList}/>)}
+
+            <div className={(view === "basic" || view === "detail") ? styles.recipesList : styles.recipesListDev}>
+                {isDetail || isBasic ?
+                    <RecipesListDetail
+                        onDelete={callOnDelete}
+                        recipesList={filteredRecipesList}
+                        ingredientsList={props.ingredientsList}
+                        view={view}/>
+                :
+                    <RecipesListDev recipesList={filteredRecipesList}/>
+                }
             </div>
         </>
     )

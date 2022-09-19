@@ -65,6 +65,7 @@ function RecipesListPage() {
         }
         return null
     }
+
     return getChild()
 }
 
