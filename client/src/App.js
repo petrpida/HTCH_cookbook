@@ -14,7 +14,7 @@ function App() {
         <div className="App">
             <Navbar collapseOnSelect expand="sm" bg="warning" className={"p-3 d-flex justify-content-between"}>
                 <Container fluid>
-                    <Navbar.Brand onClick={() => navigate("/")}>
+                    <Navbar.Brand data-testid="title" role="button" onClick={() => navigate("/")}>
                         Hatchery kuchařka
                     </Navbar.Brand>
                     <Navbar.Toggle aria-controls={`offcanvasNavbar-expand-sm`}/>

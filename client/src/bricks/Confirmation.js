@@ -5,7 +5,6 @@ function Confirmation({title, message, confirmText, onConfirm, children}) {
     const handleConfirm = () => {
         if (typeof onConfirm === "function") {
             onConfirm();
-            handleClose()
         }
     }
 
